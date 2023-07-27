@@ -27,18 +27,17 @@
 
 <body>
 
-   <!-- ======= Header ======= -->
-   <header id="header" class="fixed-top">
+<header id="header" class="fixed-top">
     <div class="container-fluid d-flex justify-content-between align-items-center">
 
-      <h1 class="logo me-auto me-lg-0"><a href="index.html">Chrissie's Store</a></h1>
+      <h1 class="logo me-auto me-lg-0"><a href="index.php">Chrissie's Store</a></h1>
 
       <nav id="navbar" class="navbar order-last order-lg-0">
         <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a class="active" href="about.html">About</a></li>
-          <li><a href="portfolio.html">Portfolio</a></li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href="index.php">Home</a></li>
+          <li><a  class="active" href="about.php">About</a></li>
+          <li><a href="portfolio.php">Portfolio</a></li>
+          <li><a href="contact.php">Contact</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
@@ -58,36 +57,42 @@
     <!-- ======= Facts Section ======= -->
     <section id="facts" class="facts">
       <div class="container" data-aos="fade-up">
+        <?php
+        // Database connection details
+        $db_host = "localhost";
+        $db_user = "root";
+        $db_pass = "";
+        $db_name = "portfolio_db";
 
-        <div class="section-title">
-          <h2>Facts</h2>
-          <p>We sell Avon products according to your skin type. Every product is always available for purchase. <br>We also recruit people to join Avon business.</p>
-        </div>
+        // Create a connection to the database
+        $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
 
-        <div class="row counters">
+        // Check the connection
+        if ($conn->connect_error) {
+          die("Connection failed: " . $conn->connect_error);
+        }
 
-          <div class="col-lg-3 col-6 text-center">
-            <span data-purecounter-start="0" data-purecounter-end="232" data-purecounter-duration="1" class="purecounter"></span>
-            <p>Clients</p>
-          </div>
+        // Fetch facts from the database
+        $facts_query = "SELECT * FROM about_info WHERE section_type='facts'";
+        $facts_result = $conn->query($facts_query);
 
-          <div class="col-lg-3 col-6 text-center">
-            <span data-purecounter-start="0" data-purecounter-end="521" data-purecounter-duration="1" class="purecounter"></span>
-            <p>Products</p>
-          </div>
+        if ($facts_result->num_rows > 0) {
+          $facts_row = $facts_result->fetch_assoc();
+          echo '<div class="section-title">';
+          echo '<h2>' . $facts_row["title"] . '</h2>';
+          echo '<p>' . $facts_row["description"] . '</p>';
+          echo '</div>';
 
-          <div class="col-lg-3 col-6 text-center">
-            <span data-purecounter-start="0" data-purecounter-end="1463" data-purecounter-duration="1" class="purecounter"></span>
-            <p>Hours Of Support</p>
-          </div>
-
-          <div class="col-lg-3 col-6 text-center">
-            <span data-purecounter-start="0" data-purecounter-end="15" data-purecounter-duration="1" class="purecounter"></span>
-            <p>Rectruited</p>
-          </div>
-
-        </div>
-
+          echo '<div class="row counters">';
+          while ($facts_row = $facts_result->fetch_assoc()) {
+            echo '<div class="col-lg-3 col-6 text-center">';
+            echo '<span class="purecounter">' . $facts_row["description"] . '</span>';
+            echo '<p>' . $facts_row["title"] . '</p>';
+            echo '</div>';
+          }
+          echo '</div>';
+        }
+        ?>
       </div>
     </section>
     <!-- End Facts Section -->
@@ -95,75 +100,55 @@
     <!-- ======= Testimonials Section ======= -->
     <section id="testimonials" class="testimonials">
       <div class="container" data-aos="fade-up">
+        <?php
+        // Fetch testimonials from the database
+        $testimonials_query = "SELECT * FROM about_info WHERE section_type='testimonials'";
+        $testimonials_result = $conn->query($testimonials_query);
 
-        <div class="section-title">
-          <h2>Testimonials</h2>
-          <p>We will be glad to work with you all with our trusted services. <br>Check out some of the reviews and feedbacks from our valued customers below:</p>
-        </div>
+        if ($testimonials_result->num_rows > 0) {
+          $testimonials_row = $testimonials_result->fetch_assoc();
+          echo '<div class="section-title">';
+          echo '<h2>' . $testimonials_row["title"] . '</h2>';
+          echo '<p>' . $testimonials_row["description"] . '</p>';
+          echo '</div>';
 
-        <div class="testimonials-slider swiper" data-aos="fade-up" data-aos-delay="100">
-          <div class="swiper-wrapper">
+          echo '<div class="testimonials-slider swiper" data-aos="fade-up" data-aos-delay="100">';
+          echo '<div class="swiper-wrapper">';
 
-            <div class="swiper-slide">
-              <div class="testimonial-item">
-                <img src="assets/img/testimonials/testimonials-1.jpg" class="testimonial-img" alt="">
-                <h3>Fundo Villian</h3>
-                <h4>Customer</h4>
-                <p>
-                  <i class="bx bxs-quote-alt-left quote-icon-left"></i>
-                  Ndine osangalala ndi okondwa kwambiri ndi katundu wa mayi Chrissie. Ndiwo ndiwabwino modabwitsa.
-                  <i class="bx bxs-quote-alt-right quote-icon-right"></i>
-                </p>
-              </div>
-            </div><!-- End testimonial item -->
+          while ($testimonials_row = $testimonials_result->fetch_assoc()) {
+            echo '<div class="swiper-slide">';
+            echo '<div class="testimonial-item">';
+            echo '<img src="' . $testimonials_row["image_path"] . '" class="testimonial-img" alt="">';
+            echo '<h3>' . $testimonials_row["title"] . '</h3>';
+            echo '<h4>' . $testimonials_row["role"] . '</h4>';
+            echo '<p>';
+            echo '<i class="bx bxs-quote-alt-left quote-icon-left"></i>';
+            echo $testimonials_row["description"];
+            echo '<i class="bx bxs-quote-alt-right quote-icon-right"></i>';
+            echo '</p>';
+            echo '</div>';
+            echo '</div>';
+          }
+          echo '</div>';
+          echo '<div class="swiper-pagination"></div>';
+          echo '</div>';
+        }
 
-            <div class="swiper-slide">
-              <div class="testimonial-item">
-                <img src="assets/img/testimonials/testimonials-2.jpg" class="testimonial-img" alt="">
-                <h3>Melisa Danwood</h3>
-                <h4>Customer</h4>
-                <p>
-                  <i class="bx bxs-quote-alt-left quote-icon-left"></i>
-                  I purchased sunscreen, and my screen problems been really improved.
-                  <i class="bx bxs-quote-alt-right quote-icon-right"></i>
-                </p>
-              </div>
-            </div><!-- End testimonial item -->
-
-            <div class="swiper-slide">
-              <div class="testimonial-item">
-                <img src="assets/img/testimonials/testimonials-3.jpg" class="testimonial-img" alt="">
-                <h3>Faith Tipoti</h3>
-                <h4>Rectruited</h4>
-                <p>
-                  <i class="bx bxs-quote-alt-left quote-icon-left"></i>
-                  I got Rectruited to join the Avon family. This is the best decision that i have ever made. And I am now able to support myself and my family.
-                  <i class="bx bxs-quote-alt-right quote-icon-right"></i>
-                </p>
-              </div>
-            </div><!-- End testimonial item -->
-          </div>
-          <div class="swiper-pagination"></div>
-        </div>
-
+        // Close the database connection
+        $conn->close();
+        ?>
       </div>
     </section><!-- End Testimonials Section -->
-
   </main><!-- End #main -->
 
-  
   <!-- ======= Footer ======= -->
   <footer id="footer">
     <div class="container">
       <div class="credits">
-
         Designed by <a href="#">Chrissie Khowoya</a>
       </div>
     </div>
   </footer><!-- End  Footer -->
-
-  <div id="preloader"></div>
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
   <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
