@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $stmt->close();
 
-    // Redirect to a -you page after successful submission
+   
     header("Location: index.php");
     exit;
 }
