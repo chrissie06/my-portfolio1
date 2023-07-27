@@ -1,8 +1,53 @@
+<?php
+// Initialize the database connection
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "portfolio_db";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Function to sanitize input data
+function sanitize_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+}
+
+// Fetch contact information from the database
+$sql_contact_info = "SELECT * FROM contact_info";
+$result_contact_info = $conn->query($sql_contact_info);
+$contact_info = $result_contact_info->fetch_assoc();
+
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = sanitize_input($_POST["name"]);
+    $email = sanitize_input($_POST["email"]);
+    $subject = sanitize_input($_POST["subject"]);
+    $message = sanitize_input($_POST["message"]);
+    $timestamp = date("Y-m-d H:i:s");
+
+    // Insert data into the database
+    $sql = "INSERT INTO contact_messages (name, email, subject, message, timestamp) VALUES (?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sssss", $name, $email, $subject, $message, $timestamp);
+    $stmt->execute();
+    $stmt->close();
+
+    // Redirect to a -you page after successful submission
+    header("Location: index.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html>
 
 <head>
-  
   <title>Chrissie's Avon Store</title>
 
   <!-- Favicons -->
@@ -22,23 +67,22 @@
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
-
 </head>
 
 <body>
 
-   <!-- ======= Header ======= -->
-   <header id="header" class="fixed-top">
+  <!-- ======= Header ======= -->
+  <header id="header" class="fixed-top">
     <div class="container-fluid d-flex justify-content-between align-items-center">
 
-      <h1 class="logo me-auto me-lg-0"><a href="index.html">Chrissie's Store</a></h1>
+      <h1 class="logo me-auto me-lg-0"><a href="index.php">Chrissie's Store</a></h1>
 
       <nav id="navbar" class="navbar order-last order-lg-0">
         <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html">About</a></li>
-          <li><a href="portfolio.html">Portfolio</a></li>
-          <li><a class="active" href="contact.html">Contact</a></li>
+          <li><a href="index.php">Home</a></li>
+          <li><a href="about.php">About</a></li>
+          <li><a href="portfolio.php">Portfolio</a></li>
+          <li><a class="active" href="contact.php">Contact</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
@@ -51,7 +95,6 @@
       </div>
 
     </div>
-
   </header><!-- End Header -->
 
   <main id="main">
@@ -72,28 +115,25 @@
               <div class="address">
                 <i class="bi bi-geo-alt"></i>
                 <h4>Location:</h4>
-                <p>Area 24, Lilongwe</p>
+                <p><?php echo $contact_info['location']; ?></p>
               </div>
 
               <div class="email">
                 <i class="bi bi-envelope"></i>
                 <h4>Email:</h4>
-                <p>chrissiekhowoya@gmail.com</p>
+                <p><?php echo $contact_info['email']; ?></p>
               </div>
 
               <div class="phone">
                 <i class="bi bi-phone"></i>
                 <h4>Call:</h4>
-                <p>+265 99 45 11 371</p>
+                <p><?php echo $contact_info['phone']; ?></p>
               </div>
-
             </div>
-
           </div>
 
           <div class="col-lg-8 mt-5 mt-lg-0">
-
-            <form action="forms/contact.php" method="post" role="form" class="php-email-form">
+            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" role="form" class="php-email-form">
               <div class="row">
                 <div class="col-md-6 form-group">
                   <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" required>
@@ -115,11 +155,9 @@
               </div>
               <div class="text-center"><button type="submit">Send Message</button></div>
             </form>
-
           </div>
 
         </div>
-
       </div>
     </section><!-- End Contact Section -->
 
@@ -135,9 +173,6 @@
     </div>
   </footer><!-- End  Footer -->
 
-  <div id="preloader"></div>
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
   <!-- Vendor JS Files -->
   <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
   <script src="assets/vendor/aos/aos.js"></script>
@@ -152,5 +187,4 @@
   <script src="assets/js/main.js"></script>
 
 </body>
-
 </html>
